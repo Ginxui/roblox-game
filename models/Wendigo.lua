@@ -1,19 +1,26 @@
 -- Wendigo monster model builder.
 -- Original design (not copied from any existing game asset): a tall, gaunt,
--- antlered horror-creature built from simple blocky parts with a Studs hide,
--- in the chunky low-poly style typical of Roblox egg/pet-chase games.
+-- antlered horror-creature built from blocky parts with a Studs hide, in
+-- the chunky low-poly style typical of Roblox egg/pet-chase games.
 --
--- Usage: paste this whole file into Studio's Command Bar and run it, or drop
--- it into a Script (e.g. in ServerScriptService), run once, then delete the
--- script -- the finished "Wendigo" Model is left behind in Workspace.
+-- v2: pinched-waist/broad-chest torso, a pelvis + shoulder bridge so the
+-- limbs read as attached rather than floating, a two-tone hide (lighter
+-- upper limbs, darker weathered extremities), a jaw, a fuller antler
+-- crown, forward-reaching clawed arms, a proper forward/back/forward
+-- digitigrade leg bend, a slimmer foot, and a dewclaw.
+--
+-- Usage: paste this whole file into Studio's Command Bar and run it, or
+-- drop it into a Script (e.g. in ServerScriptService), run once, then
+-- delete the script -- the finished "Wendigo" Model is left in Workspace.
 
 local SPAWN_CFRAME = CFrame.new(0, 0, 0) -- where the model is built; move the finished Model afterwards to relocate it
 
-local HIDE_COLOR = Color3.fromRGB(58, 56, 52)
 local HIDE_MATERIAL = Enum.Material.Studs
-local BONE_COLOR = Color3.fromRGB(214, 208, 188)
+local HIDE_COLOR = Color3.fromRGB(52, 56, 42) -- upper limbs, torso, head, neck
+local HIDE_DARK_COLOR = Color3.fromRGB(34, 36, 28) -- lower limbs, feet, jaw: weathered extremities
 local BONE_MATERIAL = Enum.Material.Slate
-local EYE_COLOR = Color3.fromRGB(196, 255, 92)
+local BONE_COLOR = Color3.fromRGB(202, 194, 158) -- ribs, antlers, claws
+local EYE_COLOR = Color3.fromRGB(201, 255, 96)
 
 local model = Instance.new("Model")
 model.Name = "Wendigo"
@@ -50,16 +57,28 @@ local root = block("HumanoidRootPart", anchorCFrame(0, 5.0, 0), Vector3.new(1, 1
 root.Transparency = 1
 model.PrimaryPart = root
 
--- spine
+-- key skeleton points, shared between torso/pelvis/shoulders and the limbs
 local hip = pt(0, 5.0, 0)
+local waist = pt(0, 6.8, -0.05)
 local chest = pt(0, 8.6, -0.1)
 local neckPt = pt(0, 9.3, -0.05)
-beam("Torso", hip, chest, 1.4, 0.9, HIDE_MATERIAL, HIDE_COLOR)
-beam("Neck", chest, neckPt, 0.55, 0.55, HIDE_MATERIAL, HIDE_COLOR)
+local leftHip, rightHip = pt(-0.62, 5.0, 0.05), pt(0.62, 5.0, 0.05)
+local leftShoulder, rightShoulder = pt(-1.05, 8.3, -0.15), pt(1.05, 8.3, -0.15)
 
--- head + snout
-block("Head", anchorCFrame(0, 10.0, -0.1), Vector3.new(1.0, 1.3, 1.1), HIDE_MATERIAL, HIDE_COLOR)
-beam("Snout", pt(0, 9.85, -0.55), pt(0, 9.75, -1.0), 0.5, 0.42, HIDE_MATERIAL, HIDE_COLOR, false)
+-- torso: narrow gaunt waist flaring out to both the pelvis and the chest
+beam("TorsoLower", hip, waist, 1.0, 0.75, HIDE_MATERIAL, HIDE_COLOR)
+beam("TorsoUpper", waist, chest, 1.5, 1.0, HIDE_MATERIAL, HIDE_COLOR)
+beam("Neck", chest, neckPt, 0.5, 0.5, HIDE_MATERIAL, HIDE_COLOR)
+
+-- pelvis/shoulder bridges so the limbs read as attached, not floating
+beam("Pelvis", leftHip, rightHip, 0.4, 0.4, HIDE_MATERIAL, HIDE_COLOR)
+beam("Shoulders", leftShoulder, rightShoulder, 0.35, 0.35, HIDE_MATERIAL, HIDE_COLOR)
+
+-- head, jaw, tapering snout
+local headCenter = anchorCFrame(0, 10.05, -0.05)
+block("Head", headCenter, Vector3.new(0.82, 1.15, 1.3), HIDE_MATERIAL, HIDE_COLOR)
+block("Jaw", anchorCFrame(0, 9.55, -0.68), Vector3.new(0.56, 0.22, 0.68), HIDE_MATERIAL, HIDE_DARK_COLOR)
+beam("Snout", pt(0, 9.95, -0.7), pt(0, 9.85, -1.25), 0.38, 0.3, HIDE_MATERIAL, HIDE_COLOR, false)
 
 -- glowing eyes
 local function eye(name, x)
@@ -67,7 +86,7 @@ local function eye(name, x)
 	part.Name = name
 	part.Shape = Enum.PartType.Ball
 	part.Size = Vector3.new(0.2, 0.2, 0.2)
-	part.CFrame = anchorCFrame(x, 10.05, -0.62)
+	part.CFrame = anchorCFrame(x, 10.15, -0.68)
 	part.Material = Enum.Material.Neon
 	part.Color = EYE_COLOR
 	part.CanCollide = false
@@ -81,71 +100,76 @@ local function eye(name, x)
 
 	return part
 end
-eye("LeftEye", -0.28)
-eye("RightEye", 0.28)
+eye("LeftEye", -0.25)
+eye("RightEye", 0.25)
 
--- exposed ribs across the chest
-for i, y in ipairs({ 6.0, 6.6, 7.2, 7.8 }) do
-	beam("Rib" .. i, pt(-0.65, y, -0.5), pt(0.65, y, -0.5), 0.14, 0.14, BONE_MATERIAL, BONE_COLOR, false)
+-- exposed ribs across the upper chest, following the torso's taper
+for i, y in ipairs({ 7.0, 7.5, 8.0, 8.4 }) do
+	local halfSpan = 0.45 + (y - 7.0) / 1.4 * 0.27
+	beam("Rib" .. i, pt(-halfSpan, y, -0.6), pt(halfSpan, y, -0.6), 0.13, 0.13, BONE_MATERIAL, BONE_COLOR, false)
 end
 
--- branching antlers
+-- a fuller antler crown: a base plus three branching tines
 local function antler(side)
 	local sign = side == "Left" and -1 or 1
-	local base = pt(sign * 0.3, 10.6, 0)
-	local mid = pt(sign * 1.0, 11.7, 0.25)
-	local tineA = pt(sign * 1.7, 12.8, 0)
-	local tineB = pt(sign * 1.5, 12.4, 0.9)
+	local base = pt(sign * 0.28, 10.6, -0.05)
+	local mid = pt(sign * 0.95, 11.6, 0.2)
+	local tineA = pt(sign * 1.6, 12.6, -0.1)
+	local tineB = pt(sign * 1.4, 12.3, 0.75)
+	local tineC = pt(sign * 0.6, 12.6, 0.55)
 
-	beam(side .. "AntlerBase", base, mid, 0.22, 0.22, BONE_MATERIAL, BONE_COLOR, false)
-	beam(side .. "AntlerTineA", mid, tineA, 0.14, 0.14, BONE_MATERIAL, BONE_COLOR, false)
-	beam(side .. "AntlerTineB", mid, tineB, 0.14, 0.14, BONE_MATERIAL, BONE_COLOR, false)
+	beam(side .. "AntlerBase", base, mid, 0.2, 0.2, BONE_MATERIAL, BONE_COLOR, false)
+	beam(side .. "AntlerTineA", mid, tineA, 0.13, 0.13, BONE_MATERIAL, BONE_COLOR, false)
+	beam(side .. "AntlerTineB", mid, tineB, 0.13, 0.13, BONE_MATERIAL, BONE_COLOR, false)
+	beam(side .. "AntlerTineC", mid, tineC, 0.12, 0.12, BONE_MATERIAL, BONE_COLOR, false)
 end
 antler("Left")
 antler("Right")
 
--- long gaunt arms with clawed hands
+-- long gaunt arms reaching forward, clawed hands
 local function arm(side)
 	local sign = side == "Left" and -1 or 1
-	local shoulder = pt(sign * 1.0, 8.5, -0.1)
-	local elbow = pt(sign * 1.4, 6.2, 0.2)
-	local wrist = pt(sign * 1.6, 3.6, 0.1)
+	local shoulder = side == "Left" and leftShoulder or rightShoulder
+	local elbow = pt(sign * 1.55, 5.9, 0.4)
+	local wrist = pt(sign * 1.9, 3.5, -0.45)
 
-	beam(side .. "UpperArm", shoulder, elbow, 0.42, 0.42, HIDE_MATERIAL, HIDE_COLOR)
-	beam(side .. "LowerArm", elbow, wrist, 0.34, 0.34, HIDE_MATERIAL, HIDE_COLOR)
+	beam(side .. "UpperArm", shoulder, elbow, 0.4, 0.4, HIDE_MATERIAL, HIDE_COLOR)
+	beam(side .. "LowerArm", elbow, wrist, 0.3, 0.3, HIDE_MATERIAL, HIDE_DARK_COLOR)
 
 	local claws = {
-		pt(sign * 1.9, 2.7, -0.3),
-		pt(sign * 1.6, 2.6, -0.55),
-		pt(sign * 1.35, 2.75, -0.35),
+		pt(sign * 2.35, 2.85, -1.15),
+		pt(sign * 2.0, 2.65, -1.35),
+		pt(sign * 1.65, 2.8, -1.2),
 	}
 	for i, tip in ipairs(claws) do
-		beam(side .. "Claw" .. i, wrist, tip, 0.08, 0.08, BONE_MATERIAL, BONE_COLOR, false)
+		beam(side .. "Claw" .. i, wrist, tip, 0.09, 0.09, BONE_MATERIAL, BONE_COLOR, false)
 	end
 end
 arm("Left")
 arm("Right")
 
--- thin digitigrade legs
+-- digitigrade legs: thigh leans forward, shin tucks back, foot plants forward
 local function leg(side)
 	local sign = side == "Left" and -1 or 1
-	local hipPt = pt(sign * 0.7, 5.0, 0)
-	local knee = pt(sign * 0.8, 2.6, 0.3)
-	local ankle = pt(sign * 0.8, 0.3, -0.3)
-	local toe = pt(sign * 0.8, 0.15, -1.0)
+	local hipPt = side == "Left" and leftHip or rightHip
+	local knee = pt(sign * 0.78, 2.7, -0.42)
+	local ankle = pt(sign * 0.84, 1.0, 0.22)
+	local toe = pt(sign * 0.88, 0.15, -0.68)
 
-	beam(side .. "UpperLeg", hipPt, knee, 0.5, 0.5, HIDE_MATERIAL, HIDE_COLOR)
-	beam(side .. "LowerLeg", knee, ankle, 0.4, 0.4, HIDE_MATERIAL, HIDE_COLOR)
-	beam(side .. "Foot", ankle, toe, 0.5, 1.0, HIDE_MATERIAL, HIDE_COLOR)
+	beam(side .. "UpperLeg", hipPt, knee, 0.46, 0.46, HIDE_MATERIAL, HIDE_COLOR)
+	beam(side .. "LowerLeg", knee, ankle, 0.34, 0.34, HIDE_MATERIAL, HIDE_DARK_COLOR)
+	beam(side .. "Foot", ankle, toe, 0.3, 0.26, HIDE_MATERIAL, HIDE_DARK_COLOR)
 
 	local toeClaws = {
-		pt(sign * 1.1, 0.1, -1.4),
-		pt(sign * 0.8, 0.1, -1.5),
-		pt(sign * 0.5, 0.1, -1.4),
+		pt(sign * 1.1, 0.08, -1.18),
+		pt(sign * 0.88, 0.04, -1.28),
+		pt(sign * 0.66, 0.08, -1.16),
 	}
 	for i, tip in ipairs(toeClaws) do
 		beam(side .. "ToeClaw" .. i, toe, tip, 0.08, 0.08, BONE_MATERIAL, BONE_COLOR, false)
 	end
+
+	beam(side .. "Dewclaw", ankle, pt(sign * 0.86, 0.78, 0.6), 0.06, 0.06, BONE_MATERIAL, BONE_COLOR, false)
 end
 leg("Left")
 leg("Right")
