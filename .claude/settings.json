@@ -1,0 +1,13 @@
+{
+  "enabledPlugins": {
+    "roblox-skills@roblox-skills": true
+  },
+  "extraKnownMarketplaces": {
+    "roblox-skills": {
+      "source": {
+        "source": "github",
+        "repo": "EL4CTEO/roblox-skills"
+      }
+    }
+  }
+}
