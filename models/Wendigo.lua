@@ -15,7 +15,7 @@ local SPAWN_CFRAME = CFrame.new(0, 0, 0) -- where the model is built; relocate t
 ----------------------------------------------------------------------
 local SKIN = Color3.fromRGB(122, 138, 108) -- sickly pale green-grey
 local ANTLER = Color3.fromRGB(90, 80, 60)
-local EYE_GLOW = Color3.fromRGB(190, 255, 255)
+local EYE_GLOW = Color3.fromRGB(10, 210, 255) -- vivid, not pale, so it pops against a bright scene
 local CLAW = Color3.fromRGB(25, 22, 20)
 local SHELL = Color3.fromRGB(230, 225, 200)
 local MAT = Enum.Material.Plastic
@@ -148,9 +148,11 @@ local upperTorso = block("UpperTorso", folders.Torso, chest, Vector3.new(2.0, 2.
 -- head (4 parts: skull, jaw, 2 eyes)
 ----------------------------------------------------------------------
 local head = block("Head", folders.Head, headCenter, Vector3.new(1.4, 1.5, 1.7), SKIN, true, upperTorso)
-wedge("Jaw", folders.Head, pt(0, 10.85, -1.9), pt(0, 10.55, -2.5), 0.8, 0.5, SKIN, false, head)
-ball("LeftEye", folders.Head, pt(-0.3, 11.2, -2.2), Vector3.new(0.25, 0.25, 0.25), Enum.Material.Neon, EYE_GLOW, head)
-ball("RightEye", folders.Head, pt(0.3, 11.2, -2.2), Vector3.new(0.25, 0.25, 0.25), Enum.Material.Neon, EYE_GLOW, head)
+-- the head's own front face sits at Z = -1.5 - 1.7/2 = -2.35; every face
+-- feature below is placed PAST that so it actually pokes out and is visible
+wedge("Jaw", folders.Head, pt(0, 10.85, -2.2), pt(0, 10.5, -2.9), 1.0, 0.55, CLAW, false, head)
+ball("LeftEye", folders.Head, pt(-0.32, 11.2, -2.5), Vector3.new(0.34, 0.34, 0.34), Enum.Material.Neon, EYE_GLOW, head)
+ball("RightEye", folders.Head, pt(0.32, 11.2, -2.5), Vector3.new(0.34, 0.34, 0.34), Enum.Material.Neon, EYE_GLOW, head)
 
 ----------------------------------------------------------------------
 -- antlers (4 parts: base + tip, both sides)
@@ -169,11 +171,13 @@ cylinder("RightAntlerTip", folders.Antlers, antlerMidR, antlerTipR, 0.13, ANTLER
 local elbowL, wristL = pt(-1.7, 7.4, -0.8), pt(-2.1, 3.4, -1.0)
 local leftUpperArm = cylinder("LeftUpperArm", folders.LeftArm, shoulderL, elbowL, 0.5, SKIN, true, upperTorso)
 local leftLowerArm = cylinder("LeftLowerArm", folders.LeftArm, elbowL, wristL, 0.4, SKIN, true, leftUpperArm)
+-- hands are oversized and dark on purpose ("big clawed hands" in the brief)
+-- so they read as a distinct feature instead of blending into the thin arms
 local handL = wristL + Vector3.new(0, -0.3, -0.1)
-local leftHand = block("LeftHand", folders.LeftArm, handL, Vector3.new(0.6, 0.6, 0.5), SKIN, true, leftLowerArm)
-wedge("LeftClaw1", folders.LeftArm, handL, handL + Vector3.new(-0.2, -0.5, -0.3), 0.15, 0.15, CLAW, false, leftHand)
-wedge("LeftClaw2", folders.LeftArm, handL, handL + Vector3.new(0, -0.55, -0.35), 0.15, 0.15, CLAW, false, leftHand)
-wedge("LeftClaw3", folders.LeftArm, handL, handL + Vector3.new(0.2, -0.5, -0.3), 0.15, 0.15, CLAW, false, leftHand)
+local leftHand = block("LeftHand", folders.LeftArm, handL, Vector3.new(0.95, 0.9, 0.8), CLAW, true, leftLowerArm)
+wedge("LeftClaw1", folders.LeftArm, handL, handL + Vector3.new(-0.4, -0.85, -0.55), 0.3, 0.3, CLAW, false, leftHand)
+wedge("LeftClaw2", folders.LeftArm, handL, handL + Vector3.new(0, -0.95, -0.65), 0.3, 0.3, CLAW, false, leftHand)
+wedge("LeftClaw3", folders.LeftArm, handL, handL + Vector3.new(0.4, -0.85, -0.55), 0.3, 0.3, CLAW, false, leftHand)
 
 ----------------------------------------------------------------------
 -- right arm: bigger, reaches further forward, claws curl in like it's
@@ -183,12 +187,12 @@ local elbowR, wristR = pt(1.8, 7.3, -1.3), pt(2.3, 3.3, -1.8)
 local rightUpperArm = cylinder("RightUpperArm", folders.RightArm, shoulderR, elbowR, 0.55, SKIN, true, upperTorso)
 local rightLowerArm = cylinder("RightLowerArm", folders.RightArm, elbowR, wristR, 0.45, SKIN, true, rightUpperArm)
 local handR = wristR + Vector3.new(0, -0.3, -0.2)
-local rightHand = block("RightHand", folders.RightArm, handR, Vector3.new(0.7, 0.7, 0.6), SKIN, true, rightLowerArm)
-local grabPoint = handR + Vector3.new(0, -0.1, -0.5) -- the imaginary egg the fingers curl toward
-wedge("RightClaw1", folders.RightArm, handR + Vector3.new(-0.25, -0.1, -0.1), grabPoint + Vector3.new(-0.1, 0.05, 0.05), 0.18, 0.18, CLAW, false, rightHand)
-wedge("RightClaw2", folders.RightArm, handR + Vector3.new(-0.08, -0.15, -0.15), grabPoint + Vector3.new(-0.03, 0.02, 0.08), 0.18, 0.18, CLAW, false, rightHand)
-wedge("RightClaw3", folders.RightArm, handR + Vector3.new(0.08, -0.15, -0.15), grabPoint + Vector3.new(0.03, 0.02, 0.08), 0.18, 0.18, CLAW, false, rightHand)
-wedge("RightClaw4", folders.RightArm, handR + Vector3.new(0.25, -0.1, -0.1), grabPoint + Vector3.new(0.1, 0.05, 0.05), 0.18, 0.18, CLAW, false, rightHand)
+local rightHand = block("RightHand", folders.RightArm, handR, Vector3.new(1.3, 1.25, 1.1), CLAW, true, rightLowerArm)
+local grabPoint = handR + Vector3.new(0, -0.15, -0.75) -- the imaginary egg the fingers curl toward
+wedge("RightClaw1", folders.RightArm, handR + Vector3.new(-0.45, -0.15, -0.15), grabPoint + Vector3.new(-0.18, 0.1, 0.1), 0.34, 0.34, CLAW, false, rightHand)
+wedge("RightClaw2", folders.RightArm, handR + Vector3.new(-0.15, -0.25, -0.25), grabPoint + Vector3.new(-0.06, 0.04, 0.14), 0.34, 0.34, CLAW, false, rightHand)
+wedge("RightClaw3", folders.RightArm, handR + Vector3.new(0.15, -0.25, -0.25), grabPoint + Vector3.new(0.06, 0.04, 0.14), 0.34, 0.34, CLAW, false, rightHand)
+wedge("RightClaw4", folders.RightArm, handR + Vector3.new(0.45, -0.15, -0.15), grabPoint + Vector3.new(0.18, 0.1, 0.1), 0.34, 0.34, CLAW, false, rightHand)
 
 ----------------------------------------------------------------------
 -- legs: long and thin (3 parts each)
@@ -206,9 +210,12 @@ block("RightFoot", folders.RightLeg, ankleR + Vector3.new(0, -0.1, -0.4), Vector
 ----------------------------------------------------------------------
 -- details: a few cracked egg shells stuck to the body/antlers (3 parts)
 ----------------------------------------------------------------------
-ball("EggShellChest", folders.Details, pt(0.5, 9.5, -1.0), Vector3.new(0.5, 0.35, 0.4), MAT, SHELL, upperTorso)
-ball("EggShellAntler", folders.Details, antlerMidL + Vector3.new(0.1, 0.1, 0), Vector3.new(0.45, 0.3, 0.35), MAT, SHELL, leftAntlerBase)
-ball("EggShellShoulder", folders.Details, shoulderL + Vector3.new(0.2, 0.3, -0.1), Vector3.new(0.4, 0.3, 0.35), MAT, SHELL, upperTorso)
+-- upperTorso's own front face sits at Z = -0.6 - 1.3/2 = -1.25 and its sides
+-- at X = +-1.0; both shells below are pushed past those so they clear the
+-- torso instead of rendering buried inside it
+ball("EggShellChest", folders.Details, pt(0.5, 9.5, -1.45), Vector3.new(0.5, 0.35, 0.4), MAT, SHELL, upperTorso)
+ball("EggShellAntler", folders.Details, antlerMidL + Vector3.new(0.15, 0.15, 0), Vector3.new(0.45, 0.3, 0.35), MAT, SHELL, leftAntlerBase)
+ball("EggShellShoulder", folders.Details, shoulderL + Vector3.new(-0.3, 0.2, -0.45), Vector3.new(0.4, 0.3, 0.35), MAT, SHELL, upperTorso)
 
 ----------------------------------------------------------------------
 -- done
