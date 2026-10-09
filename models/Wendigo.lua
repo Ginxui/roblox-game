@@ -147,7 +147,7 @@ local upperTorso = block("UpperTorso", folders.Torso, chest, Vector3.new(2.0, 2.
 ----------------------------------------------------------------------
 -- head (4 parts: skull, jaw, 2 eyes)
 ----------------------------------------------------------------------
-local head = block("Head", folders.Head, headCenter, Vector3.new(1.4, 1.5, 1.7), SKIN, true, upperTorso, CFrame.Angles(math.rad(15), 0, 0))
+local head = block("Head", folders.Head, headCenter, Vector3.new(1.4, 1.5, 1.7), SKIN, true, upperTorso)
 wedge("Jaw", folders.Head, pt(0, 10.85, -1.9), pt(0, 10.55, -2.5), 0.8, 0.5, SKIN, false, head)
 ball("LeftEye", folders.Head, pt(-0.3, 11.2, -2.2), Vector3.new(0.25, 0.25, 0.25), Enum.Material.Neon, EYE_GLOW, head)
 ball("RightEye", folders.Head, pt(0.3, 11.2, -2.2), Vector3.new(0.25, 0.25, 0.25), Enum.Material.Neon, EYE_GLOW, head)
